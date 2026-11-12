@@ -72,4 +72,6 @@ ctx.setTransform(1,0,0,1,0,0);
 $('photo').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){alert('Please choose an image file.');return}const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{portrait=img;draw()};img.src=reader.result};reader.readAsDataURL(file)});
 $('download').addEventListener('click',()=>{draw();canvas.toBlob(blob=>{if(!blob){alert('Could not create the image. Please try again.');return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(( $('fullName').value.trim()||'birthday').replace(/[^a-z0-9]+/gi,'-').toLowerCase())+'-birthday-wishes.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)},'image/png')});
 $('reset').addEventListener('click',()=>{Object.entries(defaults).forEach(([id,value])=>$(id).value=value);$('photo').value='';portrait=null;draw()});draw();
-</script></body></html>
+</script>
+<script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+</body></html>
