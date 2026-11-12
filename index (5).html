@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#061a2e"><title>Faculty of Computing | Birthday Wishes Creator</title>
+<style>
+:root{--navy:#071b30;--blue:#2785e8;--ink:#17283d;--muted:#66758a;--line:#dce4ee}
+*{box-sizing:border-box}body{margin:0;background:#eef2f7;color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:linear-gradient(115deg,#06182b,#103c63);color:#fff;padding:22px clamp(16px,4vw,46px)}header h1{font-size:clamp(1.3rem,3vw,1.9rem);margin:0 0 5px}header p{margin:0;color:#d1deeb;font-size:.93rem}
+main{max-width:1480px;margin:auto;padding:22px;display:grid;grid-template-columns:minmax(270px,350px) minmax(0,1fr);gap:22px;align-items:start}.panel,.preview-wrap{background:white;border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 28px #17324c0d}.panel{padding:20px}.panel h2{font-size:1.1rem;margin:0 0 17px}.field{margin-bottom:13px}.field label{display:block;font-size:.84rem;font-weight:700;margin-bottom:6px}.field input,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:9px;padding:10px 11px;font:inherit;font-size:.92rem;background:#fff;color:#17283d}.field textarea{min-height:76px;resize:vertical}.field input:focus,.field textarea:focus{outline:3px solid #2785e826;border-color:var(--blue)}.hint{font-size:.75rem;color:var(--muted);margin-top:5px;line-height:1.45}.upload{display:block;border:1.5px dashed #8eb8e6;background:#f3f8ff;border-radius:10px;padding:12px;text-align:center;cursor:pointer;color:#145da7;font-weight:700}.upload input{display:none}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:17px}.btn{border:0;border-radius:9px;padding:12px 10px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#edf2f7;color:#25364a}.btn:active{transform:translateY(1px)}.preview-wrap{padding:16px;min-width:0}.preview-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:0 2px 12px}.preview-head h2{font-size:1rem;margin:0}.preview-head span{font-size:.76rem;color:var(--muted)}.canvas-holder{width:100%;display:flex;justify-content:center;overflow:hidden;background:#e8eef5;border-radius:10px;padding:7px}canvas{display:block;width:100%;height:auto;max-width:100%;border-radius:5px}.mobile-note{font-size:.78rem;color:var(--muted);text-align:center;margin:10px 0 0}
+@media(max-width:850px){main{grid-template-columns:1fr;padding:12px;gap:14px}.panel{order:1}.preview-wrap{order:2}.preview-head{align-items:flex-start;flex-direction:column}.actions{position:sticky;bottom:8px;background:#fff;padding-top:8px;z-index:2}}
+@media(max-width:420px){.panel,.preview-wrap{padding:13px}.actions{grid-template-columns:1fr 1fr}.btn{font-size:.84rem;padding:11px 7px}}
+</style></head>
+<body>
+<header><h1>Faculty of Computing Birthday Wishes</h1><p>Create and download a birthday poster for your university computing family.</p></header>
+<main>
+<section class="panel" aria-label="Poster editor">
+<h2>Edit birthday poster</h2>
+<div class="field"><label for="photo">Birthday person's photo</label><label class="upload" for="photo">＋ Upload / change photo<input id="photo" type="file" accept="image/*"></label><div class="hint">Choose a portrait photo. It will be automatically cropped into the circular frame.</div></div>
+<div class="field"><label for="shortName">Short name (notification alert)</label><input id="shortName" value="Kumudu" maxlength="24"><div class="hint">Used in the alert: “It’s Kumudu’s Birthday!”</div></div>
+<div class="field"><label for="fullName">Full name (birthday greeting)</label><input id="fullName" value="Chathurika Kumuduni" maxlength="48"><div class="hint">Used in the large greeting below the notification.</div></div>
+<div class="field"><label for="date">Birthday date</label><input id="date" value="13 November" maxlength="30"></div>
+<div class="field"><label for="faculty">Faculty / batch</label><input id="faculty" value="Faculty of Computing 2023/2024" maxlength="55"></div>
+<div class="field"><label for="university">University</label><input id="university" value="Sabaragamuwa University of Sri Lanka" maxlength="65"></div>
+
+<div class="field"><label for="message">Birthday greeting</label><textarea id="message" maxlength="180">Celebrating another year of your code in life's program. Happy birthday to a future tech innovator from the computing family!</textarea></div>
+<div class="field"><label for="recommend">System recommendation</label><textarea id="recommend" maxlength="120">Celebrate with joy, coffee
+and good code</textarea><div class="hint">Use a new line to control exactly where the text wraps on the poster.</div></div>
+<div class="actions"><button class="btn secondary" id="reset" type="button">Reset template</button><button class="btn primary" id="download" type="button">↓ Download PNG</button></div>
+<div class="hint">Your changes appear in the preview immediately. Download creates a high-resolution 1500 × 1500 PNG poster.</div>
+</section>
+<section class="preview-wrap"><div class="preview-head"><h2>Live poster preview</h2><span>Fixed reference layout · 1500 × 1500 px</span></div><div class="canvas-holder"><canvas id="poster" width="1500" height="1500" aria-label="Birthday poster preview"></canvas></div><p class="mobile-note">On mobile, edit the details above, then scroll down to preview your poster.</p></section>
+</main>
+<script>
+const $=id=>document.getElementById(id),canvas=$('poster'),ctx=canvas.getContext('2d');
+const defaults={shortName:'Kumudu',fullName:'Chathurika Kumuduni',date:'13 November',faculty:'Faculty of Computing 2023/2024',university:'Sabaragamuwa University of Sri Lanka',message:"Celebrating another year of your code in life's program. Happy birthday to a future tech innovator from the computing family!",recommend:'Celebrate with joy, coffee\nand good code'};
+let portrait=null;
+function rr(x,y,w,h,r,fill,stroke=null,lw=2){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke()}}
+function fitFont(text,maxWidth,start,weight=700,family='Arial'){let size=start;ctx.font=`${weight} ${size}px ${family}`;while(ctx.measureText(text).width>maxWidth&&size>15){size--;ctx.font=`${weight} ${size}px ${family}`}return size}
+function wrapped(text,x,y,maxWidth,lineHeight,maxLines=3,align='left'){ctx.textAlign=align;const paragraphs=(text||'').split('\n');let lines=[];for(const paragraph of paragraphs){const words=paragraph.trim().split(/\s+/).filter(Boolean);let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line)}if(lines.length>maxLines){lines=lines.slice(0,maxLines);let last=lines[maxLines-1];while(ctx.measureText(last+'…').width>maxWidth&&last.length)last=last.slice(0,-1);lines[maxLines-1]=last.trim()+'…'}lines.forEach((s,i)=>ctx.fillText(s,x,y+i*lineHeight));return lines.length}
+function background(){let g=ctx.createLinearGradient(0,0,1200,1200);g.addColorStop(0,'#04182c');g.addColorStop(.48,'#082b49');g.addColorStop(1,'#031426');ctx.fillStyle=g;ctx.fillRect(0,0,1200,1200);
+// Subtle circuit-board pattern, kept behind the poster content.
+ctx.save();ctx.strokeStyle='rgba(31,137,210,.27)';ctx.lineWidth=1.6;for(let i=0;i<18;i++){let x=(i*173+18)%1200,y=(i*97+25)%1200;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+65,y);ctx.lineTo(x+102,y-38);ctx.lineTo(x+185,y-38);ctx.stroke();ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle='rgba(44,151,220,.5)';ctx.fill()}ctx.restore()}
+function placeholder(){let grad=ctx.createLinearGradient(0,300,0,700);grad.addColorStop(0,'#bfe8ff');grad.addColorStop(1,'#eefaff');ctx.fillStyle=grad;ctx.fillRect(160,300,400,400);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(350,385,40,0,Math.PI*2);ctx.arc(390,365,53,0,Math.PI*2);ctx.arc(435,390,35,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(160,590);ctx.quadraticCurveTo(260,575,330,600);ctx.quadraticCurveTo(425,605,560,650);ctx.lineTo(560,710);ctx.lineTo(160,710);ctx.closePath();ctx.fillStyle='#c2df77';ctx.fill();ctx.beginPath();ctx.moveTo(180,640);ctx.quadraticCurveTo(300,690,390,640);ctx.quadraticCurveTo(470,615,560,650);ctx.lineTo(560,710);ctx.lineTo(180,710);ctx.closePath();ctx.fillStyle='#8aa500';ctx.fill()}
+function draw(){ctx.setTransform(1.25,0,0,1.25,0,0);const v=id=>$(id).value.trim();background();
+// Date above the notification, aligned to the right edge like the reference.
+ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font=`700 ${fitFont(v('date')||'Birthday',260,34)}px Arial`;ctx.fillText((v('date')||'Birthday').toUpperCase(),1090,96);
+// Main notification window: dimensions and spacing follow the supplied poster template.
+ctx.save();ctx.shadowColor='rgba(0,0,0,.30)';ctx.shadowBlur=22;rr(102,112,996,728,27,'#f4f4f5');ctx.restore();
+ctx.fillStyle='#e9e9eb';ctx.beginPath();ctx.roundRect(102,112,996,62,[27,27,0,0]);ctx.fill();ctx.strokeStyle='#c9c9cc';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(102,174);ctx.lineTo(1098,174);ctx.stroke();
+['#ff6259','#ffbd2e','#28c840'].forEach((c,i)=>{ctx.beginPath();ctx.arc(144+i*45,143,13,0,Math.PI*2);ctx.fillStyle=c;ctx.fill()});
+ctx.textAlign='center';ctx.fillStyle='#5b5b5d';ctx.font='700 30px Arial';ctx.fillText('Birthday Notification',600,160);
+ctx.fillStyle='#05070a';ctx.font=`700 ${fitFont('Birthday Celebration Detected 🎂',890,43)}px Arial`;ctx.fillText('Birthday Celebration Detected 🎂',600,257);
+// Circular portrait on the left.
+ctx.save();ctx.beginPath();ctx.arc(380,505,211,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=9;ctx.strokeStyle='#2785e8';ctx.stroke();ctx.beginPath();ctx.arc(380,505,199,0,Math.PI*2);ctx.clip();
+if(portrait){const iw=portrait.width,ih=portrait.height,side=398,scale=Math.max(side/iw,side/ih),sw=side/scale,sh=side/scale,sx=(iw-sw)/2,sy=(ih-sh)/2;ctx.drawImage(portrait,sx,sy,sw,sh,181,306,398,398)}else placeholder();ctx.restore();
+// Right-side alert and recommendation column.
+ctx.textAlign='left';ctx.fillStyle='#2785e8';ctx.font='800 47px Arial';ctx.fillText('ALERT:',600,374);
+const alertName=v('shortName')||'Your Name';const headline=`It's ${alertName}'s Birthday!`;ctx.font=`700 ${fitFont(headline,465,39)}px Arial`;wrapped(headline,624,443,465,48,2,'left');
+ctx.fillStyle='#242424';ctx.font='700 34px Arial';ctx.fillText('System recommends:',600,544);ctx.fillStyle='#5b5b5d';ctx.font='400 31px Arial';wrapped(v('recommend'),600,596,360,41,3,'left');
+// Buttons are decorative elements in the poster, positioned on one shared baseline.
+rr(368,728,344,88,20,'#2785e8');ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='700 42px Arial';ctx.fillText('Celebrate!',540,785);rr(730,728,344,88,20,'#fff','#d2d2d2',1.5);ctx.fillStyle='#444';ctx.font=`400 ${fitFont('Remind Me Later',310,34,400)}px Arial`;ctx.fillText('Remind Me Later',902,785);
+// Centered birthday line, with the name in gold. Scale the complete line as one unit.
+const lead='Happy Birthday';const person=(v('fullName')||'Your Name')+'!';let fs=41;ctx.font=`800 ${fs}px Arial`;let leadW=ctx.measureText(lead).width;ctx.font=`800 ${fs}px Arial`;let personW=ctx.measureText(person).width;while(leadW+personW+18>1080&&fs>23){fs--;ctx.font=`800 ${fs}px Arial`;leadW=ctx.measureText(lead).width;personW=ctx.measureText(person).width}let sx=(1200-leadW-personW-18)/2;ctx.textAlign='left';ctx.font=`800 ${fs}px Arial`;ctx.fillStyle='#f8f9fb';ctx.fillText(lead,sx,934);ctx.fillStyle='#ffbd2e';ctx.fillText(person,sx+leadW+18,934);
+// Two centered greeting lines with balanced line lengths.
+ctx.fillStyle='#f3f6fa';ctx.font='400 27px Arial';wrapped(v('message'),600,1000,1050,39,3,'center');
+// Faculty footer card.
+rr(312,1080,576,94,27,'#f7f8fa');ctx.textAlign='center';ctx.fillStyle='#0b2b50';ctx.font=`700 ${fitFont(v('faculty')||'Faculty of Computing',530,29)}px Arial`;ctx.fillText(v('faculty')||'Faculty of Computing',600,1125);ctx.fillStyle='#0b2b50';ctx.font=`400 ${fitFont(v('university')||'Your University',535,24)}px Arial`;ctx.fillText(v('university')||'Your University',600,1159);
+ctx.setTransform(1,0,0,1,0,0);
+}
+['shortName','fullName','date','faculty','university','message','recommend'].forEach(id=>$(id).addEventListener('input',draw));
+$('photo').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){alert('Please choose an image file.');return}const reader=new FileReader();reader.onload=()=>{const img=new Image();img.onload=()=>{portrait=img;draw()};img.src=reader.result};reader.readAsDataURL(file)});
+$('download').addEventListener('click',()=>{draw();canvas.toBlob(blob=>{if(!blob){alert('Could not create the image. Please try again.');return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(( $('fullName').value.trim()||'birthday').replace(/[^a-z0-9]+/gi,'-').toLowerCase())+'-birthday-wishes.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)},'image/png')});
+$('reset').addEventListener('click',()=>{Object.entries(defaults).forEach(([id,value])=>$(id).value=value);$('photo').value='';portrait=null;draw()});draw();
+</script></body></html>
